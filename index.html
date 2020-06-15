@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+    integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous" />
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <title>Work Day Scheduler</title>
+</head>
+
+<body>
+  <header class="jumbotron">
+    <h1 class="display-3">Work Day Scheduler</h1>
+    <p class="lead">A simple calendar app for scheduling your work day</p>
+    <p id="currentDay" class="lead"></p>
+  </header>
+  <div class="container jumbotron">
+    <div id=formtext>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+  <script>
+
+    $(document).on("click", ".saveBtn", stordata);
+    var container = document.querySelector("#formtext");
+    var days = {};
+    var daystmp = {}
+    var month = (moment().month());
+    var oldmonth = localStorage.getItem("month");
+    console.log("month " + month + " " + oldmonth);
+    if (oldmonth = month){
+      console.log("month " + month + " " + oldmonth);
+      daystmp = retrieve();
+      if (daystmp){
+        days = daystmp;
+      } else {
+        console.log("replacing days");
+        days = daysInMonth(month); 
+        //days = daystmp;
+      }
+      //days = daysInMonth(month); 
+      renderMonth();
+    } else {
+      days = daysInMonth(month);
+      renderMonth();
+      store();
+    }
+
+    localStorage.setItem("month", month);
+    
+
+    // functions
+
+    function daysInMonth(month) {
+      var count = moment().month(month).daysInMonth();
+      var days = [];
+      for (var i = 1; i < count + 1; i++) {
+        days.push(moment().month(month).date(i));
+      }
+      var pf = JSON.stringify(days);
+      console.log("pf = " + pf)
+      return days;
+    }
+
+    function stordata() {
+      var index = $(this).data("index");
+      $(".form-control").each(function () {
+        if ($(this).data('idx') == index) {
+          var pf = $(this).val();
+          console.log("index test 3 " + pf + " " + index);
+          days[index]._agender = pf;
+          console.log("on enter " + days);
+          console.log(days);
+        }
+      });
+      store();
+    }
+
+    function store() {
+      localStorage.setItem("days", JSON.stringify(days));
+    }
+
+    function retrieve(){
+      var backJSON = localStorage.getItem("days");
+      daystmp = JSON.parse(backJSON);
+      console.log("days retrieve = " + daystmp);
+      console.log(daystmp); 
+
+    }
+
+    function renderMonth() {
+      for (var i = 0; i < days.length; i++) {
+        console.log("entering rendor - length days = " + days.length);
+        var div = document.createElement('div');
+        $("div").addClass("input-group");
+
+        var textarea = document.createElement('textarea');
+
+        textarea.setAttribute("rows", 2);
+        textarea.setAttribute("style", "resize:none");
+        textarea.setAttribute("data-idx", i);
+
+        if (days[i].agender){
+          textarea.setAttribute("placeholder",days[i].agender);
+          console.log("entered placeholder " + days[i].agender)
+        }
+
+        $("textarea").addClass("form-control");
+        $("textarea").addClass("custom-control");
+
+        var spn = document.createElement('span');
+        $("spn").addClass("input-group-btn");
+
+        var button = document.createElement("button");
+        $("button").addClass("btn")
+        $("button").addClass("btn-primary")
+        $("button").addClass("saveBtn");
+        button.textContent = "enter";
+        button.setAttribute("data-index",   i);
+
+
+        container.appendChild(div);
+        div.appendChild(textarea);
+        div.appendChild(spn);
+        spn.appendChild(button);
+      }
+    }
+  </script>
+
+</body>
+
+</html>
